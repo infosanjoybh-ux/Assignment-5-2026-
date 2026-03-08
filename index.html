@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GitHub Issues Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="tailwind.config.js"></script>
+    <style>
+      @keyframes spin { to { transform: rotate(360deg); } }
+      .spinner { animation: spin 0.75s linear infinite; }
+      .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .or-line::before, .or-line::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background-color: #d0d7de;
+      }
+      #search-input { transition: width 0.3s, border-color 0.2s, background-color 0.2s; }
+      #search-input:focus { width: 280px; }
+    </style>
+  </head>
+
+  <body class="bg-[#f0f2f5] text-[#24292f] min-h-screen font-sans">
+
+    <!-- ══════════════════ SPINNER ══════════════════ -->
+    <div id="spinner"
+         class="hidden fixed inset-0 bg-white/70 z-[9999] items-center justify-center">
+      <div class="spinner w-11 h-11 rounded-full border-4 border-gray-200 border-t-indigo-600"></div>
+    </div>
+
+    <!-- ══════════════════ LOGIN PAGE ══════════════════ -->
+    <div id="login-page" class="flex flex-col min-h-screen">
+      <div class="h-12 bg-[#1b1f24] w-full"></div>
+
+      <div class="flex-1 flex items-center justify-center px-4 py-8">
+        <div class="bg-white rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.08)] w-full max-w-[420px] px-9 py-10">
+
+          <!-- Logo + Title -->
+          <div class="text-center mb-6">
+            <img src="assets/github-logo.png" alt="GitHub Logo" class="w-14 h-14 mx-auto object-contain" />
+            <h1 class="text-[22px] font-bold text-[#1b1f24] mt-3">GitHub Issues Tracker</h1>
+            <p class="text-[13px] text-[#6e7781] mt-1">Sign in to manage your issues</p>
+          </div>
+
+          <!-- Form -->
+          <form id="login-form" novalidate class="flex flex-col gap-4">
+            <!-- Username -->
+            <div class="flex flex-col gap-1">
+              <label for="username" class="text-[13px] font-semibold text-[#24292f]">Username</label>
+              <input id="username" type="text" placeholder="Enter Username" autocomplete="username"
+                class="border border-[#d0d7de] rounded-md px-3.5 py-2.5 text-sm text-[#24292f] outline-none
+                       placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition" />
+              <span class="text-[12px] text-indigo-600">Default: admin</span>
+            </div>
+            <!-- Password -->
+            <div class="flex flex-col gap-1">
+              <label for="password" class="text-[13px] font-semibold text-[#24292f]">Password</label>
+              <input id="password" type="password" placeholder="Enter Password" autocomplete="current-password"
+                class="border border-[#d0d7de] rounded-md px-3.5 py-2.5 text-sm text-[#24292f] outline-none
+                       placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition" />
+              <span class="text-[12px] text-indigo-600">Default: admin123</span>
+            </div>
+            <!-- Error -->
+            <p id="login-error" class="hidden text-[13px] text-red-600 text-center">
+              Invalid username or password.
+            </p>
+            <!-- Submit -->
+            <button type="submit"
+              class="mt-1 bg-indigo-600 hover:bg-indigo-700 active:scale-[.99] text-white font-semibold
+                     rounded-md py-3 text-[15px] transition cursor-pointer">
+              Sign In
+            </button>
+          </form>
+
+          <!-- OR Divider -->
+          <div class="or-line flex items-center gap-2.5 text-[13px] text-[#8c959f] mt-5">OR</div>
+
+          <!-- Demo credentials -->
+          <p class="text-center text-[12px] text-[#57606a] mt-2.5">Demo Credentials:</p>
+          <div class="mt-2 bg-[#f6f8fa] border border-[#d0d7de] rounded-md px-4 py-3 text-center">
+            <p class="text-[13px] text-[#24292f] leading-7"><span class="font-semibold">Username:</span> admin</p>
+            <p class="text-[13px] text-[#24292f] leading-7"><span class="font-semibold">Password:</span> admin123</p>
+          </div>
+
+        </div>
+      </div>
+      <div class="h-12 bg-[#1b1f24] w-full"></div>
+    </div>
+
+    <!-- ══════════════════ MAIN PAGE ══════════════════ -->
+    <div id="main-page" class="hidden flex-col min-h-screen">
+
+      <!-- Navbar -->
+      <nav class="bg-[#1b1f24] h-14 flex items-center px-6 gap-4 sticky top-0 z-50">
+        <a href="#" class="flex items-center gap-2.5 text-white font-bold text-base no-underline shrink-0">
+          <img src="assets/github-logo.png" alt="GitHub Logo" class="w-7 h-7 object-contain" />
+          <span class="hidden sm:inline">GitHub Issues Tracker</span>
+        </a>
+        <div class="flex-1"></div>
+        <input id="search-input" type="search" placeholder="Search issues..."
+          class="bg-[#2d333b] border border-[#444c56] rounded-md px-3.5 py-1.5 text-[13px]
+                 text-[#e6edf3] placeholder:text-[#8b949e] outline-none w-36 sm:w-60
+                 focus:border-indigo-500 focus:bg-[#1c2128]" />
+        <button id="btn-new-issue"
+          class="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold
+                 text-[13px] rounded-md px-3.5 py-1.5 cursor-pointer transition whitespace-nowrap">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5"  y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span class="hidden sm:inline">New Issue</span>
+        </button>
+      </nav>
+
+      <!-- Content -->
+      <main class="max-w-[1280px] w-full mx-auto px-4 sm:px-6 py-6 pb-12">
+
+        <!-- Tabs -->
+        <div class="flex gap-1.5 mb-5">
+          <button data-tab="all"
+            class="tab-btn cursor-pointer bg-indigo-600 border border-indigo-600 text-white
+                   font-semibold rounded-md px-5 py-2 text-sm transition">
+            All
+          </button>
+          <button data-tab="open"
+            class="tab-btn cursor-pointer bg-transparent border border-[#d0d7de] text-[#57606a]
+                   hover:bg-[#f6f8fa] hover:text-[#24292f] font-medium rounded-md px-5 py-2 text-sm transition">
+            Open
+          </button>
+          <button data-tab="closed"
+            class="tab-btn cursor-pointer bg-transparent border border-[#d0d7de] text-[#57606a]
+                   hover:bg-[#f6f8fa] hover:text-[#24292f] font-medium rounded-md px-5 py-2 text-sm transition">
+            Closed
+          </button>
+        </div>
+
+        <!-- Issues Header Bar -->
+        <div class="bg-white border border-[#d0d7de] rounded-t-lg px-5 py-3.5
+                    flex items-center justify-between flex-wrap gap-3">
+          <div class="flex items-center gap-2.5">
+            <img src="assets/Aperture.png" alt="Issues Icon" class="w-5 h-5 shrink-0 object-contain" />
+            <div>
+              <p id="issues-count-text" class="text-base font-bold text-[#1b1f24]">0 Issues</p>
+              <p class="text-[13px] text-[#57606a]">Track and manage your project issues</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-4 text-[13px] font-medium text-[#24292f]">
+            <span class="flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#1a7f37] inline-block"></span>
+              <strong id="open-count">0</strong> Open
+            </span>
+            <span class="flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#8250df] inline-block"></span>
+              <strong id="closed-count">0</strong> Closed
+            </span>
+          </div>
+        </div>
+
+        <!-- Issues Grid -->
+        <div class="bg-white border border-[#d0d7de] border-t-0 rounded-b-lg p-4">
+          <div id="issues-grid"
+               class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5">
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+    <!-- ══════════════════ MODAL ══════════════════ -->
+    <div id="modal-overlay"
+         class="hidden fixed inset-0 bg-black/50 z-[500] items-center justify-center p-4">
+      <div id="modal-box"
+           class="animate-[modal-in_0.2s_ease] bg-white rounded-xl w-full max-w-[520px]
+                  max-h-[90vh] overflow-y-auto p-7 relative shadow-[0_16px_48px_rgba(0,0,0,0.25)]">
+        <button id="modal-close-x" title="Close"
+          class="absolute top-4 right-4 text-[#57606a] hover:text-[#1b1f24] hover:bg-[#f6f8fa]
+                 rounded-md p-1 flex items-center justify-center transition cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+        <div id="modal-content"></div>
+        <button id="btn-modal-close"
+          class="mt-5 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold
+                 rounded-md py-2.5 text-sm transition cursor-pointer">
+          Close
+        </button>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
+
+    
