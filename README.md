@@ -46,6 +46,7 @@ map does not change the original array
 
 answer- 4️⃣
 Arrow Functions allow a shorter syntax for function expressions.
+
 answer - 5️⃣
 Template Strings allow variables in strings.
 Template strings provide an easy way to interpolate variables in strings.
